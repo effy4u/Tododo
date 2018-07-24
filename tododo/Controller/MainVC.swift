@@ -12,13 +12,17 @@ class MainVC: UITableViewController {
     
     @IBOutlet var dodoTable: UITableView!
     
+    let defaults = UserDefaults.standard
+    
     var itemArray = ["Work", "School","travel"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         dodoTable.tableFooterView = UIView(frame: CGRect.zero)
+        
+        guard let iArray = defaults.array(forKey: "itemArray") as? [String] else {return}
+        self.itemArray = iArray
     }
-
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -52,7 +56,26 @@ class MainVC: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         
     }
-
+    
+    
+    @IBAction func addNewItem(_ sender: UIBarButtonItem) {
+        var textF = UITextField()
+        let alert = UIAlertController(title: "Add new todo", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add Item", style: .default) { (_) in
+            self.itemArray.append(textF.text!)
+            self.defaults.setValue(self.itemArray, forKey: "itemArray")
+            self.dodoTable.reloadData()
+        }
+        
+        alert.addTextField { (alertTF) in
+            textF = alertTF
+            alertTF.placeholder = "Create new item"
+           
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

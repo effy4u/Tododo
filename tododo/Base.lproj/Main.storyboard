@@ -49,7 +49,14 @@
                             <outlet property="delegate" destination="Z73-PG-pmR" id="1Y4-lf-E4a"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Dodo" id="ykg-S3-Jk7"/>
+                    <navigationItem key="navigationItem" title="Dodo" id="ykg-S3-Jk7">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="k5Z-Es-Lgt">
+                            <color key="tintColor" red="0.98363600500000004" green="1" blue="0.97535723679999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="addNewItem:" destination="Z73-PG-pmR" id="Qga-gT-7xl"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="dodoTable" destination="Y8m-Eg-rWC" id="ekY-ih-JhF"/>
                     </connections>
