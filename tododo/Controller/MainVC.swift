@@ -7,21 +7,40 @@
 //
 
 import UIKit
+import CoreData
 
 class MainVC: UITableViewController {
     
     @IBOutlet var dodoTable: UITableView!
     
-    let defaults = UserDefaults.standard
+//    let defaults = UserDefaults.standard
     
-    var itemArray = ["Work", "School","travel"]
+//    let defaultManager = FileManager.default.urls(for: .documentDirectory, in: .allDomainsMask).first?.appendingPathComponent("Items.plist")
+    
+    let appDelegate = UIApplication.shared.delegate as? AppDelegate
+    
+    var itemArray = [Items]()
+    
+    var textF = UITextField()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         dodoTable.tableFooterView = UIView(frame: CGRect.zero)
-        
-        guard let iArray = defaults.array(forKey: "itemArray") as? [String] else {return}
-        self.itemArray = iArray
+        loadItem()
+//        let newItem = Item(title: "Work", done: true)
+//        itemArray.append(newItem)
+//         let newItem1 = Item(title: "Cook", done: false)
+//        itemArray.append(newItem1)
+//         let newItem2 = Item(title: "Sleep", done: true)
+//        itemArray.append(newItem2)
+        print(FileManager.default.urls(for: .documentDirectory, in: .systemDomainMask))
+//        guard let iArray = defaults.array(forKey: "itemArray") as? [Item] else {return}
+//        self.itemArray = iArray
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super .viewWillAppear(animated)
+        loadItem()
     }
     // MARK: - Table view data source
 
@@ -37,38 +56,40 @@ class MainVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? itemCell else {return UITableViewCell()}
         let item = itemArray[indexPath.row]
-        cell.updateCell(name: item)
+        cell.updateCell(item: item)
+    
+        cell.accessoryType = item.done == true ? .checkmark : .none
+        
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = itemArray[indexPath.row]
-        print(item)
         
-        let cell = tableView.cellForRow(at: indexPath)
-        if cell?.accessoryType == .checkmark{
-          cell?.accessoryType = .none
-        }else{
-            cell?.accessoryType = .checkmark
-        }
+        item.done = !item.done
         
-        
+//        let manageContext = appDelegate?.persistentContainer.viewContext
+//        manageContext?.delete(item)
+//        itemArray.remove(at: indexPath.row)
+        saveItems()
         tableView.deselectRow(at: indexPath, animated: true)
         
     }
     
     
     @IBAction func addNewItem(_ sender: UIBarButtonItem) {
-        var textF = UITextField()
         let alert = UIAlertController(title: "Add new todo", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Item", style: .default) { (_) in
-            self.itemArray.append(textF.text!)
-            self.defaults.setValue(self.itemArray, forKey: "itemArray")
-            self.dodoTable.reloadData()
+            guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
+            let newItem = Items(context: manageContext)
+            newItem.title = self.textF.text
+            newItem.done = false
+            self.itemArray.append(newItem)
+            self.saveItems()
         }
         
         alert.addTextField { (alertTF) in
-            textF = alertTF
+            self.textF = alertTF
             alertTF.placeholder = "Create new item"
            
         }
@@ -76,49 +97,60 @@ class MainVC: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    func saveItems()
+    {
+        
+//        let encoder = PropertyListEncoder()
+        do{
+            guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
+            try manageContext.save()
+//            let data = try encoder.encode(itemArray)
+//            try data.write(to: defaultManager!)
+        }catch{
+            debugPrint("\(error.localizedDescription)")
+        }
+        self.dodoTable.reloadData()
+
+        
     }
-    */
 
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+    func loadItem(withRequest: NSFetchRequest<Items> = Items.fetchRequest())
+    {
+        guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
+//        let withRequest = NSFetchRequest<Items>(entityName: "Items")
+        do{
+            itemArray = try manageContext.fetch(withRequest)
+            //            if let data = try? Data(contentsOf: defaultManager!) {
+            //                let decoder = PropertyListDecoder()
+            //                itemArray = try decoder.decode([Item].self, from: data)
+        }catch{
+            debugPrint("error here \(error)")
+        }
+        dodoTable.reloadData()
     }
-    */
+    
+    
+}
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+extension MainVC: UISearchBarDelegate
+{
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let reqFetch = NSFetchRequest<Items>(entityName: "Items")
+        let predicate  = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
+        reqFetch.predicate = predicate
+        let sort  = NSSortDescriptor(key: "title", ascending: true)
+        reqFetch.sortDescriptors = [sort]
+        
+        loadItem(withRequest: reqFetch)
     }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItem()
+            DispatchQueue.main.async {
+                 searchBar.resignFirstResponder()
+            }
+           
+        }
     }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
