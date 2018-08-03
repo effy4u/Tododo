@@ -16,6 +16,9 @@
 		1D0B64A221096F36003F10B5 /* CategoryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0B64A121096F36003F10B5 /* CategoryVC.swift */; };
 		1D0B64A4210972B3003F10B5 /* CategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0B64A3210972B3003F10B5 /* CategoryCell.swift */; };
 		1D2B747621085CB000535F75 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1D2B747421085CB000535F75 /* DataModel.xcdatamodeld */; };
+		1DEBDC552114103800FE6143 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEBDC542114103800FE6143 /* Data.swift */; };
+		1DEBDC572114145800FE6143 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEBDC562114145800FE6143 /* Item.swift */; };
+		1DEBDC592114146500FE6143 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEBDC582114146500FE6143 /* Category.swift */; };
 		7632D831D981D407EEB8BE91 /* Pods_tododo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCCFB5EF9CB186713183D706 /* Pods_tododo.framework */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +34,9 @@
 		1D0B64A121096F36003F10B5 /* CategoryVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryVC.swift; sourceTree = "<group>"; };
 		1D0B64A3210972B3003F10B5 /* CategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCell.swift; sourceTree = "<group>"; };
 		1D2B747521085CB000535F75 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		1DEBDC542114103800FE6143 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		1DEBDC562114145800FE6143 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		1DEBDC582114146500FE6143 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		5C3C31BD42C555B7C6459855 /* Pods-tododo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tododo.release.xcconfig"; path = "Pods/Target Support Files/Pods-tododo/Pods-tododo.release.xcconfig"; sourceTree = "<group>"; };
 		CC75A51923278F1CC7152C0E /* Pods-tododo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tododo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tododo/Pods-tododo.debug.xcconfig"; sourceTree = "<group>"; };
 		FCCFB5EF9CB186713183D706 /* Pods_tododo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tododo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,6 +117,9 @@
 			isa = PBXGroup;
 			children = (
 				1D2B747421085CB000535F75 /* DataModel.xcdatamodeld */,
+				1DEBDC542114103800FE6143 /* Data.swift */,
+				1DEBDC562114145800FE6143 /* Item.swift */,
+				1DEBDC582114146500FE6143 /* Category.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -246,9 +255,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DEBDC552114103800FE6143 /* Data.swift in Sources */,
 				1D0B64A221096F36003F10B5 /* CategoryVC.swift in Sources */,
 				1D2B747621085CB000535F75 /* DataModel.xcdatamodeld in Sources */,
 				1D02264B210730A4004F10E5 /* AppDelegate.swift in Sources */,
+				1DEBDC572114145800FE6143 /* Item.swift in Sources */,
+				1DEBDC592114146500FE6143 /* Category.swift in Sources */,
 				1D02266221073393004F10E5 /* itemCell.swift in Sources */,
 				1D02266021073153004F10E5 /* MainVC.swift in Sources */,
 				1D0B64A4210972B3003F10B5 /* CategoryCell.swift in Sources */,
@@ -399,7 +411,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = T59TQ7LCH6;
 				INFOPLIST_FILE = tododo/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kings.tododo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -415,7 +430,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = T59TQ7LCH6;
 				INFOPLIST_FILE = tododo/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kings.tododo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;

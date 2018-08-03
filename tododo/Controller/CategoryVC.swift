@@ -8,12 +8,17 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 class CategoryVC: UITableViewController {
+    
+    let realm = try! Realm()
 
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    var cateArray = [Category]()
+//    var cateArray = [Category]()
+//    var cateArray = [CatGory]()
+    var cateArray: Results<CatGory>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,14 +38,25 @@ class CategoryVC: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cateArray.count
+        if cateArray != nil {
+            return cateArray!.count
+        }
+        return 1
+        
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath) as? CategoryCell else {return UITableViewCell()}
-        let cat = cateArray[indexPath.row]
-        cell.configureCell(cate: cat)
-        return cell
+        if cateArray != nil {
+            let cat = cateArray![indexPath.row]
+            cell.configureCell(cate: cat)
+            return cell
+        }
+        else{
+            cell.categoryName.text = "No category yet"
+            return cell
+        }
+        
     }
     
     // Mark: - Table view delegates
@@ -54,10 +70,12 @@ class CategoryVC: UITableViewController {
         var categoryText = UITextField()
         let alert  = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Category", style: .default) { (_) in
-            let category = Category(context: self.context)
-            category.name = categoryText.text
-            self.cateArray.append(category)
-            self.saveCategory()
+//            let category = Category(context: self.context)
+//            category.name = categoryText.text
+            
+            let cate = CatGory()
+            cate.name = categoryText.text!
+            self.saveCategory(category: cate)
         }
         alert.addTextField { (textF) in
             categoryText = textF
@@ -67,10 +85,13 @@ class CategoryVC: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    func saveCategory()
+    func saveCategory(category: CatGory)
     {
         do{
-            try context.save()
+//            try context.save()
+            try realm.write {
+                try realm.add(category)
+            }
         }catch{
             debugPrint("error here \(error.localizedDescription)")
         }
@@ -79,22 +100,23 @@ class CategoryVC: UITableViewController {
     
     func loadCategory()
     {
-        let fetchReq: NSFetchRequest<Category> = Category.fetchRequest()
-        
-        do{
-            cateArray = try context.fetch(fetchReq)
-        }catch{
-            debugPrint("error fetch \(error.localizedDescription)")
-        }
+//        let fetchReq: NSFetchRequest<Category> = Category.fetchRequest()
+        cateArray = realm.objects(CatGory.self)
+
+//        do{
+////            cateArray = try context.fetch(fetchReq)
+//        }catch{
+//            debugPrint("error fetch \(error.localizedDescription)")
+//        }
         tableView.reloadData()
-        
+
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "itemDetails" {
             let destination = segue.destination as! MainVC
             if let index = tableView.indexPathForSelectedRow {
-                destination.selectedCategory = cateArray[index.row]
+                destination.selectedCategory = cateArray?[index.row]
             }
             
         }

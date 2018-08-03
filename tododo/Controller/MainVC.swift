@@ -8,10 +8,13 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 class MainVC: UITableViewController {
     
     @IBOutlet var dodoTable: UITableView!
+    
+    let realm = try! Realm()
     
 //    let defaults = UserDefaults.standard
     
@@ -19,9 +22,11 @@ class MainVC: UITableViewController {
     
     let appDelegate = UIApplication.shared.delegate as? AppDelegate
     
-    var itemArray = [Items]()
+//    var itemArray = [Items]()
+    var itemArray: Results<Item>?
     
-    var selectedCategory: Category? {
+    
+    var selectedCategory: CatGory? {
         didSet{
             loadItem()
         }
@@ -37,7 +42,7 @@ class MainVC: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super .viewWillAppear(animated)
-        loadItem()
+//        loadItem()
     }
     // MARK: - Table view data source
 
@@ -47,43 +52,82 @@ class MainVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
        
-        return itemArray.count
+        return itemArray?.count ?? 1
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? itemCell else {return UITableViewCell()}
-        let item = itemArray[indexPath.row]
-        cell.updateCell(item: item)
-    
-        cell.accessoryType = item.done == true ? .checkmark : .none
+      
+        if let item = itemArray?[indexPath.row] {
+            cell.updateCell(item: item)
+            
+            cell.accessoryType = item.done == true ? .checkmark : .none
+            
+        }else{
+            cell.itemName.text = "empty list"
+          
+        }
+         return cell
         
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let item = itemArray[indexPath.row]
-        
-        item.done = !item.done
+//        if let item = itemArray?[indexPath.row] {
+//            item.done = !item.done
+//            saveItems(item: item)
+//        }
         
 //        let manageContext = appDelegate?.persistentContainer.viewContext
 //        manageContext?.delete(item)
 //        itemArray.remove(at: indexPath.row)
-        saveItems()
+        
+        if let item = itemArray?[indexPath.row] {
+            do{
+                try realm.write {
+//                    realm.delete(item)
+                    item.done = !item.done
+                }
+            }catch{
+                debugPrint("error updating \(error.localizedDescription)")
+            }
+        }
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
         
     }
     
-    
     @IBAction func addNewItem(_ sender: UIBarButtonItem) {
         let alert = UIAlertController(title: "Add new todo", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Item", style: .default) { (_) in
-            guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
-            let newItem = Items(context: manageContext)
-            newItem.title = self.textF.text
-            newItem.done = false
-            newItem.parentCategory = self.selectedCategory
-            self.itemArray.append(newItem)
-            self.saveItems()
+//            guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
+//            let newItem = Items(context: manageContext)
+            
+            if let currCategory = self.selectedCategory {
+                let dateNow = Date()
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy/MM/dd"
+                let dateString = formatter.string(from: dateNow)
+                
+                do{
+                    
+                    try self.realm.write {
+                        let newItem = Item()
+                        newItem.title = self.textF.text!
+                        newItem.dateCreated = dateNow
+                        currCategory.items.append(newItem)
+                        try self.realm.add(newItem)
+                    }
+                }catch{
+                    debugPrint("error here \(error.localizedDescription)")
+                }
+               
+                //            newItem.parentCategory = self.selectedCategory
+                //            self.itemArray.append(newItem)
+            
+            }
+            
+            self.tableView.reloadData()
+            
         }
         
         alert.addTextField { (alertTF) in
@@ -95,40 +139,49 @@ class MainVC: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    func saveItems()
-    {
-//        let encoder = PropertyListEncoder()
-        do{
-            guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
-            try manageContext.save()
-//            let data = try encoder.encode(itemArray)
-//            try data.write(to: defaultManager!)
-        }catch{
-            debugPrint("\(error.localizedDescription)")
-        }
-        self.dodoTable.reloadData()
-    }
+//    func saveItems(item: Item)
+//    {
+////        let encoder = PropertyListEncoder()
+//        do{
+////            guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
+////            try manageContext.save()
+////            let data = try encoder.encode(itemArray)
+////            try data.write(to: defaultManager!)
+//
+//            try realm.write {
+//                try realm.add(item)
+//            }
+//        }catch{
+//            debugPrint("\(error.localizedDescription)")
+//        }
+//        self.dodoTable.reloadData()
+//    }
     
-
-    func loadItem(withRequest: NSFetchRequest<Items> = Items.fetchRequest(), predicate: NSPredicate? = nil)
+// Coredata load
+//    func loadItem(withRequest: NSFetchRequest<Items> = Items.fetchRequest(), predicate: NSPredicate? = nil)
+//    {
+//        guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
+//        let catePredicate = NSPredicate(format: "parentCategory.name MATCHES %@", (selectedCategory!.name!))
+//        if let additionalPredicate = predicate {
+//            let compPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [additionalPredicate, catePredicate])
+//             withRequest.predicate = compPredicate
+//        }else{
+//            withRequest.predicate = catePredicate
+//        }
+//        do{
+//            itemArray = try manageContext.fetch(withRequest)
+//            //            if let data = try? Data(contentsOf: defaultManager!) {
+//            //                let decoder = PropertyListDecoder()
+//            //                itemArray = try decoder.decode([Item].self, from: data)
+//        }catch{
+//            debugPrint("error here \(error)")
+//        }
+//        tableView.reloadData()
+//    }
+    
+    func loadItem()
     {
-        guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
-        let catePredicate = NSPredicate(format: "parentCategory.name MATCHES %@", (selectedCategory!.name!))
-        if let additionalPredicate = predicate {
-            let compPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [additionalPredicate, catePredicate])
-             withRequest.predicate = compPredicate
-        }else{
-            withRequest.predicate = catePredicate
-        }
-        do{
-            itemArray = try manageContext.fetch(withRequest)
-            //            if let data = try? Data(contentsOf: defaultManager!) {
-            //                let decoder = PropertyListDecoder()
-            //                itemArray = try decoder.decode([Item].self, from: data)
-        }catch{
-            debugPrint("error here \(error)")
-        }
-        tableView.reloadData()
+        itemArray = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
     }
     
 }
@@ -136,12 +189,15 @@ class MainVC: UITableViewController {
 extension MainVC: UISearchBarDelegate
 {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let reqFetch = NSFetchRequest<Items>(entityName: "Items")
-        let predicate  = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
-        reqFetch.predicate = predicate
-        let sort  = NSSortDescriptor(key: "title", ascending: true)
-        reqFetch.sortDescriptors = [sort]
-        loadItem(withRequest: reqFetch, predicate: predicate)
+//        let reqFetch = NSFetchRequest<Items>(entityName: "Items")
+//        let predicate  = NSPredicate(format: "title CONTAINS [cd] %@", searchBar.text!)
+//        reqFetch.predicate = predicate
+//        let sort  = NSSortDescriptor(key: "title", ascending: true)
+//        reqFetch.sortDescriptors = [sort]
+//        loadItem(withRequest: reqFetch, predicate: predicate)
+        
+        itemArray = itemArray?.filter("title CONTAINS [cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

@@ -17,7 +17,7 @@ class itemCell: UITableViewCell {
         // Initialization code
     }
 
-    func updateCell(item: Items)
+    func updateCell(item: Item)
     {
         self.itemName.text = item.title
     }

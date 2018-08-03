@@ -23,7 +23,7 @@ class CategoryCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func configureCell(cate: Category)
+    func configureCell(cate: CatGory)
     {
         self.categoryName.text = cate.name
     }
