@@ -21,21 +21,18 @@ class MainVC: UITableViewController {
     
     var itemArray = [Items]()
     
+    var selectedCategory: Category? {
+        didSet{
+            loadItem()
+        }
+    }
+    
     var textF = UITextField()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         dodoTable.tableFooterView = UIView(frame: CGRect.zero)
-        loadItem()
-//        let newItem = Item(title: "Work", done: true)
-//        itemArray.append(newItem)
-//         let newItem1 = Item(title: "Cook", done: false)
-//        itemArray.append(newItem1)
-//         let newItem2 = Item(title: "Sleep", done: true)
-//        itemArray.append(newItem2)
         print(FileManager.default.urls(for: .documentDirectory, in: .systemDomainMask))
-//        guard let iArray = defaults.array(forKey: "itemArray") as? [Item] else {return}
-//        self.itemArray = iArray
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -84,6 +81,7 @@ class MainVC: UITableViewController {
             let newItem = Items(context: manageContext)
             newItem.title = self.textF.text
             newItem.done = false
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             self.saveItems()
         }
@@ -99,7 +97,6 @@ class MainVC: UITableViewController {
     
     func saveItems()
     {
-        
 //        let encoder = PropertyListEncoder()
         do{
             guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
@@ -110,14 +107,19 @@ class MainVC: UITableViewController {
             debugPrint("\(error.localizedDescription)")
         }
         self.dodoTable.reloadData()
-
-        
     }
+    
 
-    func loadItem(withRequest: NSFetchRequest<Items> = Items.fetchRequest())
+    func loadItem(withRequest: NSFetchRequest<Items> = Items.fetchRequest(), predicate: NSPredicate? = nil)
     {
         guard let manageContext = self.appDelegate?.persistentContainer.viewContext else {return}
-//        let withRequest = NSFetchRequest<Items>(entityName: "Items")
+        let catePredicate = NSPredicate(format: "parentCategory.name MATCHES %@", (selectedCategory!.name!))
+        if let additionalPredicate = predicate {
+            let compPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [additionalPredicate, catePredicate])
+             withRequest.predicate = compPredicate
+        }else{
+            withRequest.predicate = catePredicate
+        }
         do{
             itemArray = try manageContext.fetch(withRequest)
             //            if let data = try? Data(contentsOf: defaultManager!) {
@@ -126,9 +128,8 @@ class MainVC: UITableViewController {
         }catch{
             debugPrint("error here \(error)")
         }
-        dodoTable.reloadData()
+        tableView.reloadData()
     }
-    
     
 }
 
@@ -140,8 +141,7 @@ extension MainVC: UISearchBarDelegate
         reqFetch.predicate = predicate
         let sort  = NSSortDescriptor(key: "title", ascending: true)
         reqFetch.sortDescriptors = [sort]
-        
-        loadItem(withRequest: reqFetch)
+        loadItem(withRequest: reqFetch, predicate: predicate)
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

@@ -11,6 +11,61 @@
     </dependencies>
     <scenes>
         <!--Dodo-->
+        <scene sceneID="g9d-T8-z1O">
+            <objects>
+                <tableViewController id="33U-32-hFj" customClass="CategoryVC" customModule="tododo" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="75" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="l7L-dr-Efe">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="categoryCell" rowHeight="75" id="VFa-hg-5KS" customClass="CategoryCell" customModule="tododo" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="375" height="75"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="VFa-hg-5KS" id="bKk-X8-TO2">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="74.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NU8-31-j9p">
+                                            <rect key="frame" x="16" y="20.5" width="343" height="34.5"/>
+                                            <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="25"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="NU8-31-j9p" firstAttribute="centerY" secondItem="bKk-X8-TO2" secondAttribute="centerY" id="AY6-am-Uc5"/>
+                                        <constraint firstItem="NU8-31-j9p" firstAttribute="leading" secondItem="bKk-X8-TO2" secondAttribute="leadingMargin" id="D4R-Re-02Q"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="NU8-31-j9p" secondAttribute="trailing" id="qm6-5M-umR"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="categoryName" destination="NU8-31-j9p" id="OtC-hQ-Bod"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="33U-32-hFj" id="x0r-WK-zYr"/>
+                            <outlet property="delegate" destination="33U-32-hFj" id="m7J-u2-ugd"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Dodo" id="i1Q-Po-aEA">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="JxQ-w4-aU4">
+                            <color key="tintColor" red="0.98363600500000004" green="1" blue="0.97535723679999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="addNewCategory:" destination="33U-32-hFj" id="vzt-YQ-OCG"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <segue destination="Z73-PG-pmR" kind="show" identifier="itemDetails" id="Lyc-Bx-dvs"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Acy-Km-B6u" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="24.800000000000001" y="113.79310344827587"/>
+        </scene>
+        <!--Items-->
         <scene sceneID="GDu-0Q-3f2">
             <objects>
                 <tableViewController id="Z73-PG-pmR" customClass="MainVC" customModule="tododo" customModuleProvider="target" sceneMemberID="viewController">
@@ -57,7 +112,7 @@
                             <outlet property="delegate" destination="Z73-PG-pmR" id="1Y4-lf-E4a"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Dodo" id="ykg-S3-Jk7">
+                    <navigationItem key="navigationItem" title="Items" id="ykg-S3-Jk7">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="k5Z-Es-Lgt">
                             <color key="tintColor" red="0.98363600500000004" green="1" blue="0.97535723679999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -71,7 +126,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CkN-Mt-CYI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="470" y="114"/>
+            <point key="canvasLocation" x="737" y="114"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="po4-9U-3cW">
@@ -92,12 +147,12 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="Z73-PG-pmR" kind="relationship" relationship="rootViewController" id="zJ4-Mf-2Nc"/>
+                        <segue destination="33U-32-hFj" kind="relationship" relationship="rootViewController" id="slq-Wz-8Yc"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5Zi-1A-7kj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-265" y="114"/>
+            <point key="canvasLocation" x="-705" y="114"/>
         </scene>
     </scenes>
 </document>
